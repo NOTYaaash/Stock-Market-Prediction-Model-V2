@@ -5,6 +5,7 @@ from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 from sklearn.model_selection import train_test_split
+import matplotlib as plt
 
 data = yf.download('BRK-B', start='2000-01-01', end='2024-12-31') # data range
 
@@ -49,3 +50,9 @@ print("Mean Squared Error:", mse)
 
 #save model
 model.save('Stock_Prediction_Model.h5')
+
+plt.xlabel('Time')
+plt.ylabel('Price')
+plt.legend()
+plt.ylim(min(np.min(y), np.min(y_predict)), max(np.max(y), np.max(y_predict)))
+plt.show()
