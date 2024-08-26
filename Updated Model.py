@@ -5,9 +5,23 @@ from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 from sklearn.model_selection import train_test_split
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
-data = yf.download('BRK-B', start='2000-01-01', end='2024-12-31') # data range
+data = yf.download('AAPL', start='2000-01-01', end='2024-12-31') # data range
+
+ma_100_days = data.Close.rolling(100).mean()
+
+plt.figure(figsize=(8, 6))
+plt.plot(ma_100_days, 'r')
+plt.plot(data.Close, 'g')
+plt.show()
+
+ma_200_days = data.Close.rolling(200).mean()
+
+plt.figure(figsize=(8, 6))
+plt.plot(ma_200_days, 'r')
+plt.plot(data.Close, 'g')
+plt.show()
 
 data['Change'] = data['Close'] - data['Open']#data parameters
 
@@ -51,8 +65,24 @@ print("Mean Squared Error:", mse)
 #save model
 model.save('Stock_Prediction_Model.h5')
 
+plt.figure(figsize=(10, 8))
+
+y_predicted = model.predict(x_test)  # Evaluate on test data
+y_predicted = y_predicted * scaler.scale_[0] + scaler.min_[0]  # Inverse transform
+
+# Assuming you have the original unscaled closing prices in a variable named 'data'
+y = data['Close'].to_numpy()  # Assuming 'Close' is the closing price column
+
+plt.figure(figsize=(10, 8))
+
+# Reshape y_predict if necessary based on its actual shape
+y_predict_reshaped = np.tile(y_predicted, (1, data.shape[1], 1))  # Assuming data has multiple features
+
+plt.plot(y_predict_reshaped[0, :, 0], 'r', label='Predicted Price')  # Plot first feature
+plt.plot(y, 'g', label='Original Price')
+
 plt.xlabel('Time')
 plt.ylabel('Price')
 plt.legend()
-plt.ylim(min(np.min(y), np.min(y_predict)), max(np.max(y), np.max(y_predict)))
+plt.ylim(min(np.min(y), np.min(y_predicted)), max(np.max(y), np.max(y_predicted)))
 plt.show()
