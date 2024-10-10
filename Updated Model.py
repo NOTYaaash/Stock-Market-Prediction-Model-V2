@@ -6,6 +6,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+import mysql.connector as sql
 
 data = yf.download('AAPL', start='2000-01-01', end='2024-12-31') # data range
 
@@ -70,15 +71,15 @@ plt.figure(figsize=(10, 8))
 y_predicted = model.predict(x_test)  # Evaluate on test data
 y_predicted = y_predicted * scaler.scale_[0] + scaler.min_[0]  # Inverse transform
 
-# Assuming you have the original unscaled closing prices in a variable named 'data'
-y = data['Close'].to_numpy()  # Assuming 'Close' is the closing price column
+
+y = data['Close'].to_numpy()  
 
 plt.figure(figsize=(10, 8))
 
 # Reshape y_predict if necessary based on its actual shape
-y_predict_reshaped = np.tile(y_predicted, (1, data.shape[1], 1))  # Assuming data has multiple features
+y_predict_reshaped = np.tile(y_predicted, (1, data.shape[1], 1)) 
 
-plt.plot(y_predict_reshaped[0, :, 0], 'r', label='Predicted Price')  # Plot first feature
+plt.plot(y_predict_reshaped[0, :, 0], 'r', label='Predicted Price')  
 plt.plot(y, 'g', label='Original Price')
 
 plt.xlabel('Time')
